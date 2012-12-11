@@ -4,7 +4,6 @@
 ;
 
 org 0h
-bits 16
 
 start:
   mov ax, cs
@@ -13,8 +12,18 @@ start:
   mov si, msgHello
   call println
 
-pmode:
+  ; switch off the floppy drive motor
+  mov dx, 3F2h
+  xor al, al
+  out dx, al
+
+  ; disable PIC(8259A)
+  mov al, 0FFh
+  out 0A1h, al
+
   cli
+
+pmode:
   lgdt [gdtr]
 
   mov eax, cr0
@@ -39,17 +48,74 @@ pmodeStart:
   mov gs, bx
   mov ss, bx
 
-  xor eax, eax
-  mov ax, VideoSelector
-  mov es, ax
+  lea esp, [start]
+
   mov edi, 80*2*0 + 2*0
   lea esi, [msgPmode]
   call print
 
-  jmp $
+  ; copy IDT (Interrupt Descriptor Table)
+
+  cld
+  mov ax, SysDataSelector
+  mov es, ax
+  xor eax, eax
+  xor ecx, ecx
+  mov ax, 256
+  mov edi, 0
+
+idtLoop:
+  lea esi, [idtIgnore]
+  mov cx, 8
+  rep movsb
+  dec ax
+  jnz idtLoop
+
+  lidt [idtr]
+  sti
+
+  int 77h
+
+  jmp $ ; Hammer time!
+
+; IDT register
+idtr:
+  dw 256*8 - 1 ; limit
+  dd 0         ; base address
+
+idtIgnore:
+  dw isrIgnore
+  dw SysCodeSelector
+  db 0
+  db 8Eh
+  dw 0001h
+
+isrIgnore:
+  push gs
+  push fs
+  push es
+  push ds
+  pushad
+  pushfd
+
+  mov edi, 80*0*2
+  lea esi, [msgTest]
+  call print
+
+  popfd
+  popad
+  pop ds
+  pop es
+  pop fs
+  pop gs
+
+  iret
 
 print:
   push eax
+  push es
+  mov ax, VideoSelector
+  mov es, ax
 
 printLoop:
   or al, al
@@ -63,6 +129,7 @@ printLoop:
   jmp printLoop
 
 printEnd:
+  pop es
   pop eax
   ret
 
@@ -131,5 +198,6 @@ printlnDone:
 
 msgHello db "Hello, world!", 0
 msgPmode db "Protected mode enabled.", 0
+msgTest  db "Test!", 0
 
 times 512 - ($-$$) db 0
