@@ -3,8 +3,8 @@
 ; See the file LICENSE for more details.
 ;
 
-[org 0h]
-[bits 16]
+org 0h
+bits 16
 
 jmp 07C0h:start ; ensure that CS is set to 07C0h
 
