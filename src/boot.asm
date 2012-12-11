@@ -29,7 +29,7 @@ read:
 
   jc error
 
-  mov si, success
+  mov si, msgOk
   call println
 
   ; jump to ES:BX (where the kernel is loaded)
@@ -42,7 +42,7 @@ read:
   ;
 
 error:
-  mov si, errorMsg
+  mov si, msgErr
   call println
   cli
   hlt
@@ -50,19 +50,19 @@ error:
 println:
   lodsb
   or al, al ; => cmp al, 0
-  jz printlnDone
+  jz printlnEnd
   mov ah, 0Eh ; teletype output
   int 10h
   jmp println
-printlnDone:
+printlnEnd:
   mov al, 0Dh
   int 10h
   mov al, 0Ah
   int 10h
   ret
 
-success db "Kernel going up...", 0
-errorMsg db "Error!", 0
+msgOk  db "Kernel going up...", 0
+msgErr db "Error!", 0
 
 times 510 - ($-$$) db 0 ; pad remainder of boot sector with 0s
 dw 0AA55h ; boot signature
