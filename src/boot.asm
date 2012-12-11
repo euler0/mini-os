@@ -49,21 +49,20 @@ error:
 
 println:
   lodsb
-  or al, al
+  or al, al ; => cmp al, 0
   jz printlnDone
   mov ah, 0Eh ; teletype output
   int 10h
   jmp println
 printlnDone:
-  mov ax, 0E0Dh
-  xor bx, bx
+  mov al, 0Dh
   int 10h
   mov al, 0Ah
   int 10h
   ret
 
 success db "Kernel going up...", 0
-errorMsg db "Error.", 0
+errorMsg db "Error!", 0
 
 times 510 - ($-$$) db 0 ; pad remainder of boot sector with 0s
 dw 0AA55h ; boot signature
