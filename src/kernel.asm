@@ -3,7 +3,8 @@
 ; See the file LICENSE for more details.
 ;
 
-org 0h
+org 10000h
+bits 16
 
 start:
   mov ax, cs
@@ -54,7 +55,7 @@ pmodeStart:
   lea esi, [msgPmode]
   call print
 
-  ; copy IDT (Interrupt Descriptor Table)
+  ; copy IDT (Interrupt Descriptor Table) to 0000:0000
 
   cld
   mov ax, SysDataSelector
@@ -74,7 +75,7 @@ idtLoop:
   lidt [idtr]
   sti
 
-  int 77h
+  int 77h ; test
 
   jmp $ ; Hammer time!
 
@@ -136,7 +137,7 @@ printEnd:
 ; GDT register
 gdtr:
   dw gdtEnd - gdt - 1 ; limit
-  dd gdt+10000h       ; base address. 10000h means DS(CS)
+  dd gdt              ; base address. 10000h means DS(CS)
 
 ; GDT (Global Descriptor Table)
 ; 3.4.5 Segment Descriptors (Intel's System Programming Guide)
@@ -157,7 +158,7 @@ gdt:
 SysCodeSelector equ 08h
   dw 0FFFFh
   dw 0000h
-  db 01h
+  db 00h
   db 9Ah  ; DPL:0, type:[code, execute/read]
   db 0CFh ; G:1
   db 00h
@@ -166,7 +167,7 @@ SysCodeSelector equ 08h
 SysDataSelector equ 10h
   dw 0FFFFh
   dw 0000h
-  db 01h
+  db 00h
   db 92h  ; DPL:0, type:[data, expand-up, read/write]
   db 0CFh ; G:1
   db 00h
@@ -198,6 +199,6 @@ printlnDone:
 
 msgHello db "Hello, world!", 0
 msgPmode db "Protected mode enabled.", 0
-msgTest  db "Test!", 0
+msgTest  db "Interrupt operational!", 0
 
 times 512 - ($-$$) db 0
