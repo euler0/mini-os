@@ -119,9 +119,9 @@ print:
   mov es, ax
 
 printLoop:
+  mov al, byte [esi]
   or al, al
   jz printEnd
-  mov al, byte [esi]
   mov byte [es:edi], al
   inc edi
   mov byte [es:edi], 06h
