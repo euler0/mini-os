@@ -1,4 +1,3 @@
-; -*- x86 assembly -*-
 ;
 ; This source code is licensed under the Simplified BSD License.
 ; See the file LICENSE for more details.
