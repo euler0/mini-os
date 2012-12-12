@@ -3,6 +3,8 @@
 ; See the file LICENSE for more details.
 ;
 
+%include "system.inc"
+
 org 10000h
 bits 16
 
@@ -18,11 +20,50 @@ start:
   xor al, al
   out dx, al
 
-  ; disable PIC(8259A)
-  mov al, 0FFh
-  out 0A1h, al
+  ;
+  ; setup PIC (Programmable Interrupt Controller, 8259A)
+  ;
 
   cli
+
+  ; ICW1 - start the initialization sequence
+  mov al, ICW1_INIT+ICW1_ICW4
+  out PIC1_CMD, al
+  dw 00EBh, 00EBh ; 00EB => jmp $+2 (for delay)
+  out PIC2_CMD, al
+  dw 00EBh, 00EBh
+
+  ; ICW2 - remap PIC vector offset
+  mov al, 20h
+  out PIC1_DATA, al
+  dw 00EBh, 00EBh
+  mov al, 28h
+  out PIC2_DATA, al
+  dw 00EBh, 00EBh
+
+  ; ICW3
+  mov al, 04h
+  out PIC1_DATA, al
+  dw 00EBh, 00EBh
+  mov al, 02h
+  out PIC2_DATA, al
+  dw 00EBh, 00EBh
+
+  ; ICW4
+  mov al, ICW4_8086
+  out PIC1_DATA, al
+  dw 00EBh, 00EBh
+  out PIC2_DATA, al
+  dw 00EBh, 00EBh
+
+  ; disable master PIC except IRQ2
+  mov al, 0FBh
+  out PIC1_DATA, al
+  dw 00EBh, 00EBh
+
+  ; disable slave PIC
+  mov al, 0FFh
+  out PIC2_DATA, al
 
 pmode:
   lgdt [gdtr]
@@ -65,17 +106,25 @@ pmodeStart:
   mov ax, 256
   mov edi, 0
 
-idtLoop:
+idtCopyLoop:
   lea esi, [idtIgnore]
   mov cx, 8
   rep movsb
   dec ax
-  jnz idtLoop
+  jnz idtCopyLoop
+
+  ; install timer ISR
+  mov edi, 8*20h
+  lea esi, [idtTimer]
+  mov cx, 8
+  rep movsb
 
   lidt [idtr]
-  sti
 
-  int 77h ; test
+  mov al, 0FEh
+  out 21h, al
+
+  sti
 
   jmp $ ; Hammer time!
 
@@ -84,10 +133,41 @@ idtr:
   dw 256*8 - 1 ; limit
   dd 0         ; base address
 
+idtTimer:
+  dw isrTimer
+  dw 08h
+  db 00h
+  db 8Eh
+  dw 0001h
+
+isrTimer:
+  push gs
+  push fs
+  push es
+  push ds
+  pushad
+  pushfd
+
+  mov al, 20h
+  out 20h, al
+  mov edi, 80*2*2
+  lea esi, [msgTest]
+  call print
+  inc byte [msgTest]
+
+  popfd
+  popad
+  pop ds
+  pop es
+  pop fs
+  pop gs
+
+  iret
+
 idtIgnore:
   dw isrIgnore
   dw SysCodeSelector
-  db 0
+  db 00h
   db 8Eh
   dw 0001h
 

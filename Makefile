@@ -1,5 +1,5 @@
 AS = nasm
-ASFLAGS = -f bin
+ASFLAGS = -f bin -I src/
 
 all: kernel
 
