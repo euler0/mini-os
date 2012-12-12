@@ -3,7 +3,7 @@
 ; See the file LICENSE for more details.
 ;
 
-%include "system.inc"
+%include "inc/system.asm"
 
 org 10000h
 bits 16
@@ -267,19 +267,7 @@ VideoSelector equ 18h
 
 gdtEnd: ; end of GDT
 
-println:
-  lodsb
-  or al, al
-  jz printlnDone
-  mov ah, 0Eh ; teletype output
-  int 10h
-  jmp println
-printlnDone:
-  mov al, 0Dh
-  int 10h
-  mov al, 0Ah
-  int 10h
-  ret
+%include "inc/print.asm"
 
 msgHello db "Hello, world!", 0
 msgPmode db "Protected mode enabled.", 0
