@@ -135,26 +135,30 @@ printEnd:
   ret
 
 ; GDT register
+;
+; The limit is the size of the table subtracted by 1 because the GDT can be up
+; to 65536 bytes (a maximum of 8192 entries).
 gdtr:
   dw gdtEnd - gdt - 1 ; limit
-  dd gdt              ; base address. 10000h means DS(CS)
+  dd gdt              ; base address
 
 ; GDT (Global Descriptor Table)
 ; 3.4.5 Segment Descriptors (Intel's System Programming Guide)
+; or http://wiki.osdev.org/Global_Descriptor_Table
 ;
 ; common values - P(segment-present):1, S(descriptor type):1
 ;   D/B(default operation size):1(32-bit segment)
 
 gdt:
 ; null descriptor (unused)
-  dw 0
-  dw 0
-  db 0
-  db 0
-  db 0
-  db 0
+  dw 0 ; segment limit  0:15
+  dw 0 ; base address   0:15
+  db 0 ; base address  16:23
+  db 0 ; access byte
+  db 0 ; flags, segment limit 16:19
+  db 0 ; base address  24:31
 
-; code segment descriptor
+; code segment descriptor (base: 0, limit: FFFFF 1 MB)
 SysCodeSelector equ 08h
   dw 0FFFFh
   dw 0000h
@@ -163,7 +167,7 @@ SysCodeSelector equ 08h
   db 0CFh ; G:1
   db 00h
 
-; data segment descriptor
+; data segment descriptor (base: 0, limit: FFFFF 1 MB)
 SysDataSelector equ 10h
   dw 0FFFFh
   dw 0000h
@@ -172,7 +176,7 @@ SysDataSelector equ 10h
   db 0CFh ; G:1
   db 00h
 
-; video segment descriptor (B8000 - FFFF)
+; video segment descriptor (base: B8000, limit: FFFF 64 kB)
 VideoSelector equ 18h
   dw 0FFFFh
   dw 8000h
