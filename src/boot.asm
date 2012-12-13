@@ -3,6 +3,8 @@
 ; See the file LICENSE for more details.
 ;
 
+%include "inc/system.asm"
+
 org 0h
 bits 16
 
@@ -14,17 +16,16 @@ start:
   mov ds, ax
   mov ss, ax
 
-  call enableA20
+%if 0
+  ; Disable the A20 gate for test.
+  call disable_a20
+%endif
 
-  call checkA20
+  call enable_a20
+
+  call test_a20
   or ax, ax
-  jz test1
-
-  mov si, msgA20
-  call println
-
-test1:
-  jmp $
+  jz a20_failed
 
 read:
   ; ES:BX = 1000:0000
@@ -40,7 +41,8 @@ read:
   mov dl, 0 ; drive
   int 13h
 
-  jc error
+  mov si, msgErr
+  jc halt
 
   mov si, msgOk
   call println
@@ -54,125 +56,61 @@ read:
   ; SHOULD NOT REACH HERE
   ;
 
-error:
-  mov si, msgErr
+a20_failed:
+  mov si, msgA20
+  jmp halt
+
+enable_a20:
+  ; Who uses the keyboard controller to enable the A20 gate
+  ; in the 21st century? LOL
+  mov ax, A20_ENABLE
+  int 15h
+  ret
+
+disable_a20:
+  mov ax, A20_DISABLE
+  int 15h
+  ret
+
+test_a20:
+  push cx
+  push ax
+
+  xor cx, cx
+  mov fs, cx ; FS = 0000h
+  not cx
+  mov gs, cx ; GS = FFFFh
+  mov ax, word [fs:A20_TEST_ADDR]
+  push ax
+
+  inc ax
+  mov word [fs:A20_TEST_ADDR], ax
+  dw 00EBh, 00EBh
+  cmp ax, word [gs:A20_TEST_ADDR + 10h]
+
+  mov ax, 1
+  jne test_a20.end
+
+  mov ax, 0
+
+test_a20.end:
+  pop word [fs:A20_TEST_ADDR]
+  pop ax
+  pop cx
+
+  ret
+
+; esi: message to print
+halt:
   call println
   cli
   hlt
-
-enableA20:
-  ; keyboard controller (8042) method
-  cli
-
-  call a20_wait
-  mov al, 0ADh
-  out 64h, al
-
-  call a20_wait
-  mov al, 0D0h
-  out 64h, al
-
-  call a20_wait2
-  in al, 60h
-  push eax
-
-  call a20_wait
-  mov al, 0D1h
-  out 64h, al
-
-  call a20_wait
-  pop eax
-  or al, 02h
-  out 60h, al
-
-  call a20_wait
-  mov al, 0AEh
-  out 64h, al
-
-  call a20_wait
-  sti
-  ret
-
-a20_wait:
-  in al, 64h
-  test al, 02h
-  jnz a20_wait
-  ret
-
-a20_wait2:
-  in al, 64h
-  test al, 01h
-  jz a20_wait2
-  ret
-
-  ; BIOS method
-  ;mov ax, 2401h
-  ;int 15h
-
-  ; fast A20 method
-  ;in al, 92h
-  ;test al, 02h
-  ;jnz enableA20End
-  ;or al, 02h
-  ;and al, 0FEh
-  ;out 92h, al
-enableA20End
-  ret
-
-checkA20:
-  pushf
-  push ds
-  push es
-  push di
-  push si
-
-  cli
-
-  xor ax, ax ; ax = 0
-  mov es, ax
-
-  not ax      ; ax = FFFFh
-  mov ds, ax
-
-  mov di, 500h
-  mov si, 510h
-
-  mov al, byte [es:di]
-  push ax
-
-  mov al, byte [ds:si]
-  push ax
-
-  mov byte [es:di], 00h
-  mov byte [ds:si], 0FFh
-
-  cmp byte [es:di], 0FFh
-
-  pop ax
-  mov byte [ds:si], al
-
-  pop ax
-  mov byte [es:di], al
-
-  mov ax, 0
-  je checkA20End
-
-  mov ax, 1
-
-checkA20End:
-  pop si
-  pop di
-  pop es
-  pop ds
-  popf
-
-  ret
 
 %include "inc/print.asm"
 
 msgOk  db "Kernel going up...", 0
 msgErr db "Error!", 0
-msgA20 db "A20 enabled!", 0
+msgA20 db "Could not enable A20 gate.", 0
 
 times 510 - ($-$$) db 0 ; pad remainder of boot sector with 0s
 dw 0AA55h ; boot signature
