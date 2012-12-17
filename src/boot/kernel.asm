@@ -3,7 +3,7 @@
 ; See the file LICENSE for more details.
 ;
 
-%include "inc/system.asm"
+%include "system.asm"
 
 org 10000h
 bits 16
@@ -263,7 +263,7 @@ VideoSelector equ 18h
 
 gdtEnd: ; end of GDT
 
-%include "inc/print.asm"
+%include "print.asm"
 
 msgHello db "Hello, world!", 0
 msgPmode db "Protected mode enabled.", 0

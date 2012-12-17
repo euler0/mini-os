@@ -3,7 +3,7 @@
 ; See the file LICENSE for more details.
 ;
 
-%include "inc/system.asm"
+%include "system.asm"
 
 org 0h
 bits 16
@@ -111,7 +111,7 @@ halt:
   cli
   hlt
 
-%include "inc/print.asm"
+%include "print.asm"
 
 msgOk  db "Kernel going up...", 0
 msgErr db "Error!", 0

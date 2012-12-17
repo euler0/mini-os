@@ -1,15 +1,16 @@
-AS = nasm
-ASFLAGS = -f bin -I src/
+include Makefile.inc
 
-all: kernel
+SUBDIRS= src
 
-kernel: build_dir
-	$(AS) $(ASFLAGS) src/boot.asm -o build/boot
-	$(AS) $(ASFLAGS) src/kernel.asm -o build/kernel
-	@cat build/boot build/kernel > build/kernel.img
+#all: build_dir
 
-build_dir:
-	@mkdir -p build
+#build_dir:
+#	mkdir -p build
 
-clean:
-	@rm -r build
+#.PHONY: clean
+#clean:
+
+.PHONY: subdirs $(SUBDIRS)
+subdirs: $(SUBDIRS)
+$(SUBDIRS):
+	$(MAKE) -C $@
