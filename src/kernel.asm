@@ -15,11 +15,6 @@ start:
   mov si, msgHello
   call println
 
-  ; switch off the floppy drive motor
-  mov dx, 3F2h
-  xor al, al
-  out dx, al
-
   ;
   ; setup PIC (Programmable Interrupt Controller, 8259A)
   ;

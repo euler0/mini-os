@@ -44,6 +44,11 @@ read:
   mov si, msgErr
   jc halt
 
+  ; switch off the floppy drive motor
+  mov dx, 0x3F2
+  xor al, al
+  out dx, al
+
   mov si, msgOk
   call println
 
