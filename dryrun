@@ -1,3 +1,9 @@
 #!/usr/bin/env bash
 
-qemu -fda src/boot/bootloader.img
+if [ $# == 0 ]; then
+  qemu -kernel src/boot/kernel.elf
+elif [ "$1" == "-boot" ]; then
+  qemu -fda src/boot/kernel.img
+else
+  echo "Error: Invalid argument '$1'."
+fi

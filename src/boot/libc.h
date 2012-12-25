@@ -23,7 +23,12 @@
  * SUCH DAMAGE.
  */
 
-int main()
-{
-  return 0;
-}
+#ifndef libc_h
+#define libc_h
+
+#include <stddef.h>
+
+void *memset(void *dest, int ch, size_t count);
+void *memcpy(void *dest, const void *src, size_t count);
+
+#endif
