@@ -1,16 +1,10 @@
-include Makefile.inc
+SUBDIR= src
 
-SUBDIRS= src
+COMMANDS= depend
 
-#all: build_dir
+${COMMANDS}: ${SUBDIR}
+# 	@echo ${.TARGET}
+# 	${MAKE} -m ${.CURDIR}/mk -C . ${.TARGET}
 
-#build_dir:
-#	mkdir -p build
-
-#.PHONY: clean
-#clean:
-
-.PHONY: subdirs $(SUBDIRS)
-subdirs: $(SUBDIRS)
-$(SUBDIRS):
-	$(MAKE) -C $@
+${SUBDIR}: .PHONY
+	${MAKE} -m ${.CURDIR}/mk -C ${.TARGET}

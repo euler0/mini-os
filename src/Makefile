@@ -1,6 +1,3 @@
-SUBDIRS = boot
+SUBDIR= kernel
 
-.PHONY: subdirs $(SUBDIRS)
-subdirs: $(SUBDIRS)
-$(SUBDIRS):
-	$(MAKE) -C $@
+.include <subdir.mk>

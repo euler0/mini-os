@@ -1,3 +1,7 @@
+2013-01-03  Vincent Lee  <vincentlee.kr@gmail.com>
+
+  * Support BSD Make as a primary build script.
+
 2012-12-14  Vincent Lee  <vincentlee.kr@gmail.com>
 
   * Enable the A20 gate.

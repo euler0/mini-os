@@ -15,52 +15,6 @@ start:
   mov si, msgHello
   call println
 
-  ;
-  ; setup PIC (Programmable Interrupt Controller, 8259A)
-  ;
-
-  cli
-
-  ; ICW1 - start the initialization sequence
-  mov al, ICW1_INIT+ICW1_ICW4
-  out PIC1_CMD, al
-  dw 00EBh, 00EBh ; 00EB => jmp $+2 (for IO wait)
-  out PIC2_CMD, al
-  dw 00EBh, 00EBh
-
-  ; ICW2 - remap PIC vector offset
-  ; IRQ0 starts at 20h and IRQ8 starts at 28h
-  mov al, 20h
-  out PIC1_DATA, al
-  dw 00EBh, 00EBh
-  mov al, 28h
-  out PIC2_DATA, al
-  dw 00EBh, 00EBh
-
-  ; ICW3
-  mov al, 04h       ; IRQ2 -> connection to slave
-  out PIC1_DATA, al
-  dw 00EBh, 00EBh
-  mov al, 02h
-  out PIC2_DATA, al
-  dw 00EBh, 00EBh
-
-  ; ICW4
-  mov al, ICW4_8086
-  out PIC1_DATA, al
-  dw 00EBh, 00EBh
-  out PIC2_DATA, al
-  dw 00EBh, 00EBh
-
-  ; disable master PIC except IRQ2
-  mov al, 0FBh
-  out PIC1_DATA, al
-  dw 00EBh, 00EBh
-
-  ; disable slave PIC
-  mov al, 0FFh
-  out PIC2_DATA, al
-
 pmode:
   lgdt [gdtr]
 

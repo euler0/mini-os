@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 if [ $# == 0 ]; then
-  qemu -kernel src/boot/kernel.elf
+  qemu -kernel src/kernel/kernel
 elif [ "$1" == "-boot" ]; then
-  qemu -fda src/boot/kernel.img
+  echo "Boot from disk image is working in progress."
+  #qemu -fda kernel.img
 else
   echo "Error: Invalid argument '$1'."
 fi

@@ -23,56 +23,54 @@
  * SUCH DAMAGE.
  */
 
+#ifndef kernel_h
+#define kernel_h
+
 #include <stdint.h>
 
-#include "libc.h"
+ #define countof(array) (sizeof(array) / sizeof(array[0]))
 
-void printf(const char *msg)
-{
-  unsigned char *vram = (unsigned char *)(0xB8000 + (80 * 0 * 2) + (0 * 2));
-
-  for (const char *c = msg; *c; c++) {
-    *vram++ = *c;
-    *vram++ = 0x07;
-  }
-}
-
-void clear_screen()
-{
-  memset((void *)0xB8000, 0, 80 * 2 * 25);
-}
-
-struct gdt {
+typedef struct {
   uint16_t limit;
   uint32_t base_addr;
-};
+} __attribute__((packed)) DescriptorTable;
 
-struct gdt_entry {
-  uint16_t limit;
-  uint16_t base_addr;
-  uint16_t base_addr2:8;
-  uint16_t type:4;
-  uint16_t s:1;
-  uint16_t dpl:2;
-  uint16_t p:1;
-  uint16_t limit2:4;
-  uint16_t avl:1;
-  uint16_t unused:1;
-  uint16_t d:1;
-  uint16_t g:1;
-  uint16_t base_addr3:8;
-};
+typedef enum {
+  SEGTYPE_CODE,
+  SEGTYPE_DATA,
+  SEGTYPE_USERCODE,
+  SEGTYPE_USERDATA
+} SegmentType;
 
-int main()
-{
-  extern uint32_t magic;
-  extern void *mbd;
+typedef struct {
+  unsigned int limit;
+  unsigned int base;
+  SegmentType type;
+} SegmentDescriptor;
 
-  if (magic != 0x2BADB002)
-    return 0;
+typedef struct {
+  uint16_t offset;
+  uint16_t selector;
+  uint8_t always0;
+  uint8_t flags;
+  uint16_t offset_hi;
+} __attribute__((packed)) InterruptDescriptor;
 
-  clear_screen();
-  printf("Hello, world!");
+#if 0
+typedef struct {
+  uint16_t limit;         // Segment limit
+  uint32_t base_addr:24;  // Segment base address
+  uint32_t type:4;        // Segment type
+  uint32_t S:1;           // Descriptor type (0 = system; 1 = code or data)
+  uint32_t DPL:2;         // Descriptor privilege level
+  uint32_t P:1;           // Segment present
+  uint16_t limit_high:4;
+  uint16_t A:1;           // Available for use by system software
+  uint16_t L:1;           // 64-bit code segment (IA-32e only)
+  uint16_t DB:1;          // Default operation size (0 = 16-bit segment; 1 = 32-bit segment)
+  uint16_t G:1;           // Granularity
+  uint16_t base_addr_high:8;
+} __attribute__((packed)) SegmentDescriptor;
+#endif
 
-  return 0;
-}
+#endif
