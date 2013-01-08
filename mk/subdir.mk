@@ -1,4 +1,4 @@
 # -*- Makefile -*-
 
 ${SUBDIR}: .PHONY
-	${MAKE} -m ${.CURDIR}/mk -C ${.TARGET}
+	${MAKE} -C ${.TARGET}

@@ -23,7 +23,7 @@
  * SUCH DAMAGE.
  */
 
- #include <stdarg.h>
+#include <stdarg.h>
 
 #include "kernel.h"
 #include "libc.h"
