@@ -1,15 +1,21 @@
 # -*- Makefile -*-
 
 OBJS= ${SRCS:N*.h:R:S/$/.o/g}
+# Generated assembly files
+ASMS= ${SRCS:M*.c:R:S/$/.c.S/g}
+
+DEPENDFILE= .depend
+DPSRCS= ${SRCS:M*.c}
+
+all: ${PROG}
 
 ${PROG}: ${OBJS}
 	$(LD) $(LDFLAGS) -o ${.TARGET} ${.ALLSRC}
 
-# DEPENDFILE?= .depend
-# MKDEP_CFLAGS= -MD
-# DPSRCS= ${SRCS:M*.c}
+clean:
+	rm -f ${PROG} ${OBJS} ${ASMS} ${DEPENDFILE}
 
-# depend: ${DEPENDFILE}
+depend: ${DEPENDFILE}
 
-# ${DEPENDFILE}: ${DPSRCS}
-# 	${CC} ${CFLAGS} ${MKDEP_CFLAGS} -c ${.ALLSRC}
+${DEPENDFILE}: ${DPSRCS}
+	mkdep -f ${DEPENDFILE} -c ${.ALLSRC}

@@ -1,4 +1,6 @@
 # -*- Makefile -*-
 
-${SUBDIR}: .PHONY
-	${MAKE} -C ${.TARGET}
+all clean depend:
+.for dir in ${SUBDIR}
+	${MAKE} -C ${dir} ${.TARGET}
+.endfor
