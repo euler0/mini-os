@@ -4,4 +4,4 @@ build/
 *.c.S
 *.o
 *.sublime-workspace
-kernel
+src/kernel/kernel

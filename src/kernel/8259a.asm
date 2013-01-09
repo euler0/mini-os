@@ -5,6 +5,8 @@
 ; 8259A Programmable Interrupt Controller (PIC)
 ;
 
+global pic_init
+
 PIC1           equ 0x20  ; master
 PIC2           equ 0xA0 ; slave
 PIC1_CMD       equ PIC1

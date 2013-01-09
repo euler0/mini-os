@@ -4,10 +4,9 @@
 ;
 
 global loader
-global gdt_flush
-global idt_flush
 
 extern start
+extern halt
 
 ; Multiboot
 MB_PAGEALIGN equ 1<<0 ; Align all boot modules on i386 page (4KB) boundaries.
@@ -35,30 +34,7 @@ loader:
   cli
   call start
 
-  cli
-.hang:
-  hlt
-  jmp .hang
-
-gdt_flush:
-  mov eax, [esp+4]
-  lgdt [eax]
-
-  mov ax, 0x10
-  mov ds, ax
-  mov es, ax
-  mov fs, ax
-  mov gs, ax
-  mov ss, ax
-
-  jmp 0x08:.flush
-.flush:
-  ret
-
-idt_flush:
-  mov eax, [esp+4]
-  lidt [eax]
-  ret
+  call halt
 
 section .bss
 

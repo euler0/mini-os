@@ -1,3 +1,11 @@
+2013-01-09  Vincent Lee  <vincentlee.kr@gmail.com>
+
+  * Add make targets; clean, depend
+  * Add x86.asm, system.h
+  * x86.asm (halt): New function.
+  * kernel.c (panic): New function.
+  * kernel.c (vprintf): New function separated from printf.
+
 2013-01-03  Vincent Lee  <vincentlee.kr@gmail.com>
 
   * Support BSD Make as a primary build script.

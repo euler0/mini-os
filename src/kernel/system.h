@@ -23,54 +23,18 @@
  * SUCH DAMAGE.
  */
 
-#ifndef kernel_h
-#define kernel_h
+#ifndef system_h
+#define system_h
 
-#include <stdint.h>
+// Implemented in 8259a.asm
+void pic_init();
 
-#define countof(array) (sizeof(array) / sizeof(array[0]))
+// Implemented in x86.asm
+void gdt_flush(void *gdtr);
+void idt_flush(void *idtr);
+void halt();
 
-typedef struct {
-  uint16_t limit;
-  uint32_t base_addr;
-} __attribute__((packed)) DescriptorTable;
-
-typedef enum {
-  SEGTYPE_CODE,
-  SEGTYPE_DATA,
-  SEGTYPE_USERCODE,
-  SEGTYPE_USERDATA
-} SegmentType;
-
-typedef struct {
-  unsigned int limit;
-  unsigned int base;
-  SegmentType type;
-} SegmentDescriptor;
-
-typedef struct {
-  uint16_t offset;
-  uint16_t selector;
-  uint8_t always0;
-  uint8_t flags;
-  uint16_t offset_hi;
-} __attribute__((packed)) InterruptDescriptor;
-
-#if 0
-typedef struct {
-  uint16_t limit;         // Segment limit
-  uint32_t base_addr:24;  // Segment base address
-  uint32_t type:4;        // Segment type
-  uint32_t S:1;           // Descriptor type (0 = system; 1 = code or data)
-  uint32_t DPL:2;         // Descriptor privilege level
-  uint32_t P:1;           // Segment present
-  uint16_t limit_high:4;
-  uint16_t A:1;           // Available for use by system software
-  uint16_t L:1;           // 64-bit code segment (IA-32e only)
-  uint16_t DB:1;          // Default operation size (0 = 16-bit segment; 1 = 32-bit segment)
-  uint16_t G:1;           // Granularity
-  uint16_t base_addr_high:8;
-} __attribute__((packed)) SegmentDescriptor;
-#endif
+// Implemented in kernel.c
+void panic(const char *format, ...);
 
 #endif

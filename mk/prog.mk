@@ -7,7 +7,7 @@ ASMS= ${SRCS:M*.c:R:S/$/.c.S/g}
 DEPENDFILE= .depend
 DPSRCS= ${SRCS:M*.c}
 
-all: ${PROG}
+all: depend ${PROG}
 
 ${PROG}: ${OBJS}
 	$(LD) $(LDFLAGS) -o ${.TARGET} ${.ALLSRC}

@@ -27,6 +27,7 @@
 
 #include "kernel.h"
 #include "libc.h"
+#include "system.h"
 
 static int putchar(int ch)
 {
@@ -37,29 +38,26 @@ static int putchar(int ch)
   return ch;
 }
 
-// Source: freebsd:/sys/boot/i386/boot2/boot2.c
-static void printf(const char *fmt, ...)
+static void vprintf(const char *format, va_list arg)
 {
-  va_list ap;
   static char buf[10];
   char *s;
   unsigned u;
   int c;
 
-  va_start(ap, fmt);
-  while ((c = *fmt++)) {
+  while ((c = *format++)) {
     if (c == '%') {
-      c = *fmt++;
+      c = *format++;
       switch (c) {
       case 'c':
-        putchar(va_arg(ap, int));
+        putchar(va_arg(arg, int));
         continue;
       case 's':
-        for (s = va_arg(ap, char *); *s; s++)
+        for (s = va_arg(arg, char *); *s; s++)
           putchar(*s);
         continue;
       case 'u':
-        u = va_arg(ap, unsigned);
+        u = va_arg(arg, unsigned);
         s = buf;
         do
           *s++ = '0' + u % 10U;
@@ -71,7 +69,26 @@ static void printf(const char *fmt, ...)
     }
     putchar(c);
   }
-  va_end(ap);
+}
+
+static void printf(const char *format, ...)
+{
+  va_list arg;
+
+  va_start(arg, format);
+  vprintf(format, arg);
+  va_end(arg);
+}
+
+void panic(const char *format, ...)
+{
+  va_list arg;
+
+  va_start(arg, format);
+  vprintf(format, arg);
+  va_end(arg);
+
+  halt();
 }
 
 static void clear_screen()
@@ -122,9 +139,6 @@ static uint8_t gdt[(countof(segments) + 1) * 8];
 
 static DescriptorTable idtr;
 static InterruptDescriptor idt[256];
-
-extern void gdt_flush(void *gdtr);
-extern void idt_flush(void *idtr);
 
 static void gdt_init()
 {
@@ -211,9 +225,11 @@ void start(void *mbd, uint32_t magic)
   if (magic != 0x2BADB002)
     return;
 
+  pic_init();
   gdt_init();
   idt_init();
 
   clear_screen();
-  printf("Hello, world!\n");
+
+  panic("Hello, world!\n");
 }

@@ -15,7 +15,7 @@
     "ensure_newline_at_eof_on_save": true,
     "sublimeclang_additional_language_options":
     {
-      "c": ["-Wno-unused-variable", "-Wno-unused-functions", "-fno-builtin"]
+      "c": ["-Wno-unused-variable", "-Wno-unused-function", "-fno-builtin"]
     }
   }
 }
