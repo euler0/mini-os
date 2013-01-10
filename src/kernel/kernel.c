@@ -128,9 +128,8 @@ static void sd_encode(uint8_t *dest, const SegmentDescriptor *seg)
 }
 
 static SegmentDescriptor segments[] = {
-  { .limit = 0x1FFFE, .base = 0, .type = SEGTYPE_CODE },
-  { .limit = 0xFFFF, .base = 0, .type = SEGTYPE_DATA },
-  //{ .limit = 0xFFFF, .base = 0xB8000, .type = SEGTYPE_DATA } // Video memory
+  { .limit = 0xFFFFFFFF, .base = 0, .type = SEGTYPE_CODE },
+  { .limit = 0xFFFFFFFF, .base = 0, .type = SEGTYPE_DATA }
 };
 
 // Global Descriptor Table (GDT)
