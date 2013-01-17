@@ -145,6 +145,8 @@ static void gdt_init()
   for (int i = 0; i < countof(segments); ++i)
     sd_encode(&gdt[(i + 1) * 8], &segments[i]);
 
+  // The limit is the size of the table subtracted by 1 because the GDT can be
+  // up to 65536 bytes (a maximum of 8192 entries).
   gdtr.limit = sizeof(gdt) - 1;
   gdtr.base_addr = (uint32_t)gdt;
 
