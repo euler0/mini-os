@@ -29,9 +29,18 @@
 #include "libc.h"
 #include "system.h"
 
+#define vram_next_line(addr) ((unsigned char *) \
+  ((unsigned int)addr + 160 - ((unsigned int)addr % 160) + 64) \
+)
+
 static int putchar(int ch)
 {
   static unsigned char *vram = (unsigned char *)0xB8000;
+
+  if (ch == '\n') {
+    vram = vram_next_line(vram);
+    return ch;
+  }
 
   *vram++ = ch;
   *vram++ = 0x07;
@@ -224,7 +233,7 @@ static void idt_init()
 void start(void *mbd, uint32_t magic)
 {
   if (magic != 0x2BADB002)
-    return;
+    panic("Multiboot: Magic number mismatch.\n");
 
   pic_init();
   gdt_init();

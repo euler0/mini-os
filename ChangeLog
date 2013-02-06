@@ -1,3 +1,7 @@
+2013-02-06  Vincent Lee  <vincentlee.kr@gmail.com>
+
+  * kernel.c (putchar): Support newline escape sequence.
+
 2013-01-09  Vincent Lee  <vincentlee.kr@gmail.com>
 
   * Add make targets; clean, depend
