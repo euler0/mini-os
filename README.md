@@ -37,6 +37,7 @@ The project is released under the Simplified BSD License. For the formal details
 
 ## Acknowledgements
 
-##### Copyright 1992-2013 The FreeBSD Project. All rights reserved. #####
+##### The FreeBSD Project #####
 
+Copyright 1992-2013 The FreeBSD Project. All rights reserved.  
 This project may adopt snippets of FreeBSD under the simplified BSD license. (http://www.freebsd.org/copyright/freebsd-license.html)
