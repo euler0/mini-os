@@ -34,3 +34,9 @@ This is my own implementation of a operating system for the x86 architecture. Th
 ## License ##
 
 The project is released under the Simplified BSD License. For the formal details, see the file `LICENSE`.
+
+## Acknowledgements
+
+##### Copyright 1992-2013 The FreeBSD Project. All rights reserved. #####
+
+This project may adopt snippets of FreeBSD under the simplified BSD license. (http://www.freebsd.org/copyright/freebsd-license.html)
