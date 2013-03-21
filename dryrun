@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 if [ $# == 0 ]; then
   qemu -kernel src/kernel/kernel

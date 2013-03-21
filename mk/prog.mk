@@ -2,7 +2,8 @@
 
 OBJS= ${SRCS:N*.h:R:S/$/.o/g}
 # Generated assembly files
-ASMS= ${SRCS:M*.c:R:S/$/.c.S/g}
+ASMS=  ${SRCS:M*.c:R:S/$/.c.s/g}
+ASMS+= ${SRCS:M*.S:R:S/$/.S.s/g}
 
 DEPENDFILE= .depend
 DPSRCS= ${SRCS:M*.c}

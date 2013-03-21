@@ -23,17 +23,18 @@
  * SUCH DAMAGE.
  */
 
-#ifndef system_h
-#define system_h
+#include "kernel.h"
 
-// Implemented in 8259a.asm
-void pic_init();
-
-// Implemented in x86.asm
-void idt_flush(void *idtr);
-void halt();
-
-// Implemented in kernel.c
-void panic(const char *format, ...);
-
-#endif
+void ssdtosd(struct soft_segment_descriptor *ssd,
+             struct segment_descriptor *sd)
+{
+  sd->sd_lobase = (ssd->ssd_base) & 0xffffff;
+  sd->sd_hibase = (ssd->ssd_base >> 24) & 0xff;
+  sd->sd_lolimit = (ssd->ssd_limit) & 0xffff;
+  sd->sd_hilimit = (ssd->ssd_limit >> 16) & 0xf;
+  sd->sd_type = ssd->ssd_type;
+  sd->sd_dpl = ssd->ssd_dpl;
+  sd->sd_p = ssd->ssd_p;
+  sd->sd_def32 = ssd->ssd_def32;
+  sd->sd_gran = ssd->ssd_gran;
+}

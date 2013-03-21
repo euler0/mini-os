@@ -23,17 +23,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef system_h
-#define system_h
+#include "assym.h"
+#include "kernel.h"
 
-// Implemented in 8259a.asm
-void pic_init();
-
-// Implemented in x86.asm
-void idt_flush(void *idtr);
-void halt();
-
-// Implemented in kernel.c
-void panic(const char *format, ...);
-
-#endif
+ASSYM(KCSEL, GSEL(GCODE_SEL, SEL_KPL));
+ASSYM(KDSEL, GSEL(GDATA_SEL, SEL_KPL));

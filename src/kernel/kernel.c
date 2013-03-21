@@ -105,61 +105,75 @@ static void clear_screen()
   memset((void *)0xB8000, 0, 80 * 2 * 25);
 }
 
-static void sd_encode(uint8_t *dest, const SegmentDescriptor *seg)
-{
-  unsigned int limit = seg->limit;
+union descriptor gdt[NGDT];
 
-  //if ((seg->limit > 0xFFFF) && (seg->limit & 0xFFF) != 0xFFF)
-  //  ;
-
-  if (limit > 0xFFFF) {
-    limit = limit >> 12;
-    dest[6] = 0xC0;
-  } else {
-    dest[6] = 0x40;
-  }
-
-  // Encode the limit
-  dest[0] = limit & 0xFF;
-  dest[1] = (limit >> 8) & 0xFF;
-  dest[6] |= (limit >> 16) & 0xF;
-
-  // Encode the base address
-  dest[2] = seg->base & 0xFF;
-  dest[3] = (seg->base >> 8) & 0xFF;
-  dest[4] = (seg->base >> 16) & 0xFF;
-  dest[7] = (seg->base >> 24) & 0xFF;
-
-  if (seg->type == SEGTYPE_CODE)
-    dest[5] = 0x9A;
-  else if (seg->type == SEGTYPE_DATA)
-    dest[5] = 0x92;
-}
-
-static SegmentDescriptor segments[] = {
-  { .limit = 0xFFFFFFFF, .base = 0, .type = SEGTYPE_CODE },
-  { .limit = 0xFFFFFFFF, .base = 0, .type = SEGTYPE_DATA }
+struct soft_segment_descriptor gdt_segs[] = {
+/* GNULL_SEL    0 Null Descriptor */ {
+  .ssd_base = 0x0,
+  .ssd_limit = 0x0,
+  .ssd_type = 0,
+  .ssd_dpl = SEL_KPL,
+  .ssd_p = 0,
+  .ssd_xx = 0, .ssd_xx1 = 0,
+  .ssd_def32 = 0,
+  .ssd_gran = 0 },
+/* GCODE_SEL    1 Code Descriptor for kernel */ {
+  .ssd_base = 0x0,
+  .ssd_limit = 0xfffff,
+  .ssd_type = SDT_MEMERA,
+  .ssd_dpl = SEL_KPL,
+  .ssd_p = 1,
+  .ssd_xx = 0, .ssd_xx1 = 0,
+  .ssd_def32 = 1,
+  .ssd_gran = 1 },
+/* GDATA_SEL    2 Data Descriptor for kernel */ {
+  .ssd_base = 0x0,
+  .ssd_limit = 0xfffff,
+  .ssd_type = SDT_MEMRWA,
+  .ssd_dpl = SEL_KPL,
+  .ssd_p = 1,
+  .ssd_xx = 0, .ssd_xx1 = 0,
+  .ssd_def32 = 1,
+  .ssd_gran = 1 },
+/* GUCODE_SEL    3 Code Descriptor for user */ {
+  .ssd_base = 0x0,
+  .ssd_limit = 0xfffff,
+  .ssd_type = SDT_MEMERA,
+  .ssd_dpl = SEL_UPL,
+  .ssd_p = 1,
+  .ssd_xx = 0, .ssd_xx1 = 0,
+  .ssd_def32 = 1,
+  .ssd_gran = 1 },
+/* GUDATA_SEL    4 Data Descriptor for user */ {
+  .ssd_base = 0x0,
+  .ssd_limit = 0xfffff,
+  .ssd_type = SDT_MEMRWA,
+  .ssd_dpl = SEL_UPL,
+  .ssd_p = 1,
+  .ssd_xx = 0, .ssd_xx1 = 0,
+  .ssd_def32 = 1,
+  .ssd_gran = 1 }
 };
 
-// Global Descriptor Table (GDT)
-static DescriptorTable gdtr;
-static uint8_t gdt[(countof(segments) + 1) * 8];
+struct region_descriptor r_gdt;
+struct region_descriptor r_idt;
 
+#if 0
 static DescriptorTable idtr;
 static InterruptDescriptor idt[256];
+#endif
 
 static void gdt_init()
 {
-  memset(gdt, 0, 8); // Null descriptor (unused)
-  for (int i = 0; i < countof(segments); ++i)
-    sd_encode(&gdt[(i + 1) * 8], &segments[i]);
+  for (int i = 0; i < NGDT; ++i)
+    ssdtosd(&gdt_segs[i], &gdt[i].sd);
 
   // The limit is the size of the table subtracted by 1 because the GDT can be
   // up to 65536 bytes (a maximum of 8192 entries).
-  gdtr.limit = sizeof(gdt) - 1;
-  gdtr.base_addr = (uint32_t)gdt;
+  r_gdt.rd_limit = NGDT * sizeof(gdt[0]) - 1;
+  r_gdt.rd_base = (int)gdt;
 
-  gdt_flush(&gdtr);
+  lgdt(&r_gdt);
 }
 
 typedef struct {
@@ -173,6 +187,7 @@ void isr_handler(Registers regs)
 {
 }
 
+#if 0
 static void idt_set_gate(int num, uint32_t addr, uint16_t sel, uint8_t flags)
 {
   idt[num].offset = addr & 0xFFFF;
@@ -229,17 +244,20 @@ static void idt_init()
 
   idt_flush(&idtr);
 }
+#endif
 
-void start(void *mbd, uint32_t magic)
+void cstart(uint32_t magic, uint32_t addr)
 {
   if (magic != 0x2BADB002)
     panic("Multiboot: Magic number mismatch.\n");
 
+  clear_screen();
+
   pic_init();
   gdt_init();
+#if 0
   idt_init();
-
-  clear_screen();
+#endif
 
   panic("Hello, world!\n");
 }

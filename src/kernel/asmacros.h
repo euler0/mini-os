@@ -23,17 +23,13 @@
  * SUCH DAMAGE.
  */
 
-#ifndef system_h
-#define system_h
+#ifndef asmacros_h
+#define asmacros_h
 
-// Implemented in 8259a.asm
-void pic_init();
+#define ALIGN_DATA .p2align 2      /* 4 byte alignment, zero filled */
+#define ALIGN_TEXT .p2align 2,0x90 /* 4 byte alignment, nop filled */
 
-// Implemented in x86.asm
-void idt_flush(void *idtr);
-void halt();
-
-// Implemented in kernel.c
-void panic(const char *format, ...);
+#define ENTRY(name) ALIGN_TEXT; .global name; name:
+#define END(name)  .size name, . - name
 
 #endif

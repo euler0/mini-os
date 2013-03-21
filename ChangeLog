@@ -1,4 +1,21 @@
-2013-02-07  Vincent Lee <vincentlee.kr@gmail.com>
+2013-03-22  Vincent Lee  <vincentlee.kr@gmail.com>
+
+  * Reimplement multiboot.S(gas) from multiboot.asm(nasm)
+
+2013-03-13  Vincent Lee  <vincentlee.kr@gmail.com>
+
+  * Replace gdt_flush with lgdt
+
+2013-03-12  Vincent Lee  <vincentlee.kr@gmail.com>
+
+  * Use as(binutils): .S files be preprocessed by clang.
+  * Add asmacros.h, support.S
+
+2013-03-08  Vincent Lee  <vincentlee.kr@gmail.com>
+
+  * Add machdep.c
+
+2013-02-07  Vincent Lee  <vincentlee.kr@gmail.com>
 
   * Add GNUmakefile: Issue a useful error message if a user tries to build
     the project using GNU make.

@@ -23,17 +23,58 @@
  * SUCH DAMAGE.
  */
 
-#ifndef system_h
-#define system_h
+/* The magic field should contain this. */
+#define MULTIBOOT_HEADER_MAGIC	0x1badb002
+	
+/* Align all boot modules on 4KB boundaries. */
+#define MULTIBOOT_PAGE_ALIGN	0x00000001
 
-// Implemented in 8259a.asm
-void pic_init();
+/* Pass memory information to OS. */
+#define MULTIBOOT_MEMORY_INFO	0x00000002
 
-// Implemented in x86.asm
-void idt_flush(void *idtr);
-void halt();
+/* The flags for the Multiboot header. */
+#define MULTIBOOT_HEADER_FLAGS	(MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO)
 
-// Implemented in kernel.c
-void panic(const char *format, ...);
+/* The size of our stack *16KB) */
+#define STACK_SIZE		0x4000
+	
+	.text
 
-#endif
+	.global	start
+start:
+	jmp	multiboot_entry
+
+	/* Align 32 bits boundry. */
+	.align	4
+
+	/* Multiboot header. */
+multiboot_header:
+	/* magic */
+	.long	MULTIBOOT_HEADER_MAGIC
+	/* flags */
+	.long	MULTIBOOT_HEADER_FLAGS
+	/* checksum */
+	.long	-(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
+
+multiboot_entry:
+	/* Initialize the stack pointer. */
+	movl	$(stack + STACK_SIZE), %esp
+
+	/* Reset EFLAGS. */
+	pushl	$0
+	popf
+
+	/* Push the pointer to the Multiboot information structure. */
+	pushl	%ebx
+	/* Push the magic value. */
+	pushl	%eax
+
+	/* Enter the C main function. */
+	call	cstart
+
+	/* Halt. */
+loop:	hlt
+	jmp	loop
+
+	/* Stack area. */
+	.comm	stack, STACK_SIZE

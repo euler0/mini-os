@@ -3,7 +3,7 @@
   [
     {
       "path": ".",
-      "file_exclude_patterns": ["*.sublime-workspace", "*.S", "*.depend"]
+      "file_exclude_patterns": ["*.sublime-workspace", "*.c.s", "*.S.s", "*.depend"]
       //"folder_exclude_patterns": [""]
     }
   ],

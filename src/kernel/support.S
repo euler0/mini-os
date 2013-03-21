@@ -23,17 +23,30 @@
  * SUCH DAMAGE.
  */
 
-#ifndef system_h
-#define system_h
+#include "asmacros.h"
 
-// Implemented in 8259a.asm
-void pic_init();
+	.text
 
-// Implemented in x86.asm
-void idt_flush(void *idtr);
-void halt();
+/* void lgdt(struct region_descriptor *rdp); */
+ENTRY(lgdt)
+	movl	4(%esp),%eax
+	lgdt	(%eax)
 
-// Implemented in kernel.c
-void panic(const char *format, ...);
+	/* flush the prefetch queue */
+	jmp	1f
+	nop
+1:
+	/* reload selectors */
+	movl	$0x10,%eax		/* GDATA_SEL*8 */
+	movl	%eax,%ds
+	movl	%eax,%es
+	movl	%eax,%fs
+	movl	%eax,%gs
+	movl	%eax,%ss
 
-#endif
+	/* reload code selector by turning return into intersegmental return */
+	movl	(%esp),%eax
+	pushl	%eax
+	movl	$0x08,4(%esp) /* GCODE_SEL*8 */
+	lret
+END(lgdt)
