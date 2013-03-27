@@ -1,3 +1,7 @@
+2013-03-27  Vincent Lee  <vincentlee.kr@gmail.com>
+
+  * Remove kernel.asm
+
 2013-03-22  Vincent Lee  <vincentlee.kr@gmail.com>
 
   * Reimplement multiboot.S(gas) from multiboot.asm(nasm)
