@@ -1,6 +1,9 @@
 2013-03-27  Vincent Lee  <vincentlee.kr@gmail.com>
 
   * Remove kernel.asm
+  * Add exception.S, segments.h
+  * support.S (lidt): New function.
+  * machdep,c (setidt): New function.
 
 2013-03-22  Vincent Lee  <vincentlee.kr@gmail.com>
 

@@ -105,77 +105,6 @@ static void clear_screen()
   memset((void *)0xB8000, 0, 80 * 2 * 25);
 }
 
-union descriptor gdt[NGDT];
-
-struct soft_segment_descriptor gdt_segs[] = {
-/* GNULL_SEL    0 Null Descriptor */ {
-  .ssd_base = 0x0,
-  .ssd_limit = 0x0,
-  .ssd_type = 0,
-  .ssd_dpl = SEL_KPL,
-  .ssd_p = 0,
-  .ssd_xx = 0, .ssd_xx1 = 0,
-  .ssd_def32 = 0,
-  .ssd_gran = 0 },
-/* GCODE_SEL    1 Code Descriptor for kernel */ {
-  .ssd_base = 0x0,
-  .ssd_limit = 0xfffff,
-  .ssd_type = SDT_MEMERA,
-  .ssd_dpl = SEL_KPL,
-  .ssd_p = 1,
-  .ssd_xx = 0, .ssd_xx1 = 0,
-  .ssd_def32 = 1,
-  .ssd_gran = 1 },
-/* GDATA_SEL    2 Data Descriptor for kernel */ {
-  .ssd_base = 0x0,
-  .ssd_limit = 0xfffff,
-  .ssd_type = SDT_MEMRWA,
-  .ssd_dpl = SEL_KPL,
-  .ssd_p = 1,
-  .ssd_xx = 0, .ssd_xx1 = 0,
-  .ssd_def32 = 1,
-  .ssd_gran = 1 },
-/* GUCODE_SEL    3 Code Descriptor for user */ {
-  .ssd_base = 0x0,
-  .ssd_limit = 0xfffff,
-  .ssd_type = SDT_MEMERA,
-  .ssd_dpl = SEL_UPL,
-  .ssd_p = 1,
-  .ssd_xx = 0, .ssd_xx1 = 0,
-  .ssd_def32 = 1,
-  .ssd_gran = 1 },
-/* GUDATA_SEL    4 Data Descriptor for user */ {
-  .ssd_base = 0x0,
-  .ssd_limit = 0xfffff,
-  .ssd_type = SDT_MEMRWA,
-  .ssd_dpl = SEL_UPL,
-  .ssd_p = 1,
-  .ssd_xx = 0, .ssd_xx1 = 0,
-  .ssd_def32 = 1,
-  .ssd_gran = 1 }
-};
-
-struct region_descriptor r_gdt;
-struct region_descriptor r_idt;
-
-#if 0
-static DescriptorTable idtr;
-static InterruptDescriptor idt[256];
-#endif
-
-static void gdt_init()
-{
-  for (int i = 0; i < NGDT; ++i)
-    ssdtosd(&gdt_segs[i], &gdt[i].sd);
-
-  // The limit is the size of the table subtracted by 1 because the GDT can be
-  // up to 65536 bytes (a maximum of 8192 entries).
-  r_gdt.rd_limit = NGDT * sizeof(gdt[0]) - 1;
-  r_gdt.rd_base = (int)gdt;
-
-  lgdt(&r_gdt);
-}
-
 typedef struct {
   uint32_t ds;
   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
@@ -253,8 +182,9 @@ void cstart(uint32_t magic, uint32_t addr)
 
   clear_screen();
 
+  init386();
+
   pic_init();
-  gdt_init();
 #if 0
   idt_init();
 #endif

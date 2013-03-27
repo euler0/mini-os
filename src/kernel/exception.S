@@ -23,27 +23,6 @@
  * SUCH DAMAGE.
  */
 
-#ifndef kernel_h
-#define kernel_h
+#define TRAP(a) pushl $(a)
 
-#include <stdint.h>
-
-#include "segments.h"
-
-#define countof(array) (sizeof(array) / sizeof(array[0]))
-
-extern union descriptor gdt[];
-
-extern struct soft_segment_descriptor gdt_segs[];
-extern struct gate_descriptor *idt;
-extern struct region_descriptor r_gdt, r_idt;
-
-extern void init386();
-
-extern void lgdt(struct region_descriptor *rdp);
-extern void lidt(struct region_descriptor *rdp);
-
-typedef void inthand_t(uint32_t cs, uint32_t ef, uint32_t esp, uint32_t ss);
-extern void setidt(int idx, inthand_t *func, int type, int dpl, int sel);
-
-#endif
+  .text

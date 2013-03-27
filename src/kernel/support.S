@@ -50,3 +50,10 @@ ENTRY(lgdt)
 	movl	$0x08,4(%esp) /* GCODE_SEL*8 */
 	lret
 END(lgdt)
+
+/* void lidt(struct region_descriptor *rdp); */
+ENTRY(lidt)
+	movl	4(%esp),%eax
+	lidt	(%eax)
+	ret
+END(lidt)
