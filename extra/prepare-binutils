@@ -1,8 +1,11 @@
 #!/usr/bin/env sh
 
 name="binutils"
-version="2.23.1"
+version="2.26"
 package=$name-$version
+target=$1-elf
+
+echo $target
 
 wget -c http://ftp.gnu.org/gnu/$name/$package.tar.bz2
 
@@ -10,8 +13,8 @@ tar -xjvf $package.tar.bz2
 
 cd $package
 
-./configure --target=i686-elf --prefix=$HOME
-make
+./configure --target=$target --prefix=$HOME/local
+make CFLAGS=-Wno-error=deprecated-declarations
 make install
 
 cd ..
