@@ -1,11 +1,36 @@
 #!/usr/bin/env sh
 
-name="binutils"
-version="2.26"
+name=binutils
+version=2.26
 package=$name-$version
-target=$1-elf
 
-echo $target
+function fatal {
+    echo $1
+    exit 1
+}
+
+function print_usage {
+    fatal "Usage: $(basename $0) -t {mips|x86}"
+}
+
+if [ $# -eq 0 ]; then
+    print_usage
+fi
+
+while getopts ":t:" opt; do
+    case $opt in
+        t) target_arch=$OPTARG ;;
+        \?) print_usage ;;
+        :) print_usage ;;
+    esac
+done
+
+if [ $target_arch != "mips" -a $target_arch != "x86" ]; then
+    fatal "Unsupported target archtecture: $target_arch"
+fi
+
+target_abi=elf
+target=$target_arch-$target_abi
 
 wget -c http://ftp.gnu.org/gnu/$name/$package.tar.bz2
 
