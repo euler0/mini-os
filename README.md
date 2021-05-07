@@ -1,41 +1,32 @@
-# mini-os #
+# mini-os
 
-This is my own implementation of an operating system for the x86 architecture.
+Sometimes I build my own operating system, one pebble at a time.
 
-## Prepare Development Environment in FreeBSD
+## Prerequisites
 
-1. Install GNU binutils for i686-elf target.
-  ```
-  /usr/ports/devel/cross-binutils # make TGTARCH=i686 TGTABI=elf install clean
-  ```
+1. GNU binutils (i686-elf target)
+2. QEMU
+3. BSD Make
+4. mkdep
+5. NASM
+6. Clang
 
-2. Install QEMU emulator.
-  ```
-  /usr/ports/emulators/qemu # make -DBATCH install clean
-  ```
+In macOS,
 
-## Or, in macOS
-
-1. Install GNU binutils for i686-elf target.
-  ```
-  $ brew install i686-elf-binutils
-  # or
-  $ cd extra && ./prepare-binutils -t i686
-  ```
-
-2. Install QEMU emulator.
-  ```
-  $ brew install qemu
-  ```
-
-3. Install BSD Make.
-  ```
-  $ brew install bsdmake
-  ```
+```sh
+$ brew install i686-elf-binutils
+$ brew install qemu
+$ brew install bsdmake
+$ brew install nasm
+```
 
 ## License ##
 
 The project is released under the Simplified BSD License. For the formal details, see the file `LICENSE`.
+
+## References
+
+1. [make](https://www.freebsd.org/cgi/man.cgi?make(1))
 
 ## Acknowledgements
 
