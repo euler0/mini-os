@@ -1,6 +1,6 @@
 # mini-os #
 
-This is my own implementation of a operating system for the x86 architecture. There's no official name for the project, and never will be. The project will always be self-taught, unstable, and stupid :) Any feedbacks are much appreciated.
+This is my own implementation of an operating system for the x86 architecture.
 
 ## Prepare Development Environment in FreeBSD
 
@@ -14,11 +14,13 @@ This is my own implementation of a operating system for the x86 architecture. Th
   /usr/ports/emulators/qemu # make -DBATCH install clean
   ```
 
-## Or, in OS X
+## Or, in macOS
 
 1. Install GNU binutils for i686-elf target.
   ```
-  $ cd extra && ./prepare-binutils
+  $ brew install i686-elf-binutils
+  # or
+  $ cd extra && ./prepare-binutils -t i686
   ```
 
 2. Install QEMU emulator.

@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 name=binutils
-version=2.26
+version=2.36.1
 package=$name-$version
 
 function fatal {
@@ -10,7 +10,7 @@ function fatal {
 }
 
 function print_usage {
-    fatal "Usage: $(basename $0) -t {mips|x86}"
+    fatal "Usage: $(basename $0) -t {i686|mips}"
 }
 
 if [ $# -eq 0 ]; then
@@ -25,7 +25,7 @@ while getopts ":t:" opt; do
     esac
 done
 
-if [ $target_arch != "mips" -a $target_arch != "x86" ]; then
+if [ $target_arch != "i686" -a $target_arch != "mips" ]; then
     fatal "Unsupported target archtecture: $target_arch"
 fi
 
@@ -34,12 +34,12 @@ target=$target_arch-$target_abi
 
 wget -c http://ftp.gnu.org/gnu/$name/$package.tar.bz2
 
-tar -xjvf $package.tar.bz2
+tar -xjf $package.tar.bz2
 
 cd $package
 
 ./configure --target=$target --prefix=$HOME/local
-make CFLAGS=-Wno-error=deprecated-declarations
+make
 make install
 
 cd ..
