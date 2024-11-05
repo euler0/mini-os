@@ -5,7 +5,7 @@
 
 println:
   lodsb
-  or al, al ; => cmp al, 0
+  test al, al
   jz printlnEnd
   mov ah, 0Eh ; teletype output
   int 10h

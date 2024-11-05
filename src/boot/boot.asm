@@ -11,7 +11,7 @@ bits 16
 jmp 07C0h:start ; ensure that CS is set to 07C0h
 
 start:
-  ; DS = CS
+  ; DS, SS = CS
   mov ax, cs
   mov ds, ax
   mov ss, ax
@@ -24,7 +24,7 @@ start:
   call enable_a20
 
   call test_a20
-  or ax, ax
+  test ax, ax
   jz a20_failed
 
 read:
@@ -105,7 +105,8 @@ test_a20.end:
 
   ret
 
-; esi: message to print
+; Arguments:
+;   si: message to print
 halt:
   call println
   cli
@@ -114,7 +115,7 @@ halt:
 %include "print.asm"
 
 msgOk  db "Kernel going up...", 0
-msgErr db "Error!", 0
+msgErr db "Could not read the next sector.", 0
 msgA20 db "Could not enable A20 gate.", 0
 
 times 510 - ($-$$) db 0 ; pad remainder of boot sector with 0s
