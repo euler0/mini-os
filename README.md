@@ -26,11 +26,12 @@ The project is released under the Simplified BSD License. For the formal details
 
 ## References
 
-1. [make](https://www.freebsd.org/cgi/man.cgi?make(1))
+* [make](https://www.freebsd.org/cgi/man.cgi?make(1))
+* [A20 - a pain from the past](https://aeb.win.tue.nl/linux/kbd/A20.html)
 
 ## Acknowledgements
 
 ##### The FreeBSD Project #####
 
-Copyright 1992-2013 The FreeBSD Project. All rights reserved.  
+Copyright 1992-2013 The FreeBSD Project. All rights reserved.
 This project may adopt snippets of FreeBSD under the simplified BSD license. (http://www.freebsd.org/copyright/freebsd-license.html)

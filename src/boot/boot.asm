@@ -5,6 +5,9 @@
 
 %include "system.asm"
 
+; disable A20 gate for test
+%define DISABLE_A20 0
+
 org 0h
 bits 16
 
@@ -16,18 +19,27 @@ start:
   mov ds, ax
   mov ss, ax
 
-%if 0
-  ; Disable the A20 gate for test.
+%if DISABLE_A20
   call disable_a20
 %endif
+
+  call test_a20
+  test ax, ax
+  jnz loadkern
+
+  mov si, msgA20Disabled
+  call println
 
   call enable_a20
 
   call test_a20
   test ax, ax
-  jz a20_failed
+  jnz loadkern
 
-read:
+  mov si, msgA20Failed
+  jmp halt
+
+loadkern:
   ; ES:BX = 1000:0000
   mov ax, 1000h
   mov es, ax
@@ -45,7 +57,7 @@ read:
   jc halt
 
   ; switch off the floppy drive motor
-  mov dx, 0x3F2
+  mov dx, 3F2h
   xor al, al
   out dx, al
 
@@ -61,21 +73,17 @@ read:
   ; SHOULD NOT REACH HERE
   ;
 
-a20_failed:
-  mov si, msgA20
-  jmp halt
-
 enable_a20:
-  ; Who uses the keyboard controller to enable the A20 gate
-  ; in the 21st century? LOL
   mov ax, A20_ENABLE
   int 15h
   ret
 
+%if DISABLE_A20
 disable_a20:
   mov ax, A20_DISABLE
   int 15h
   ret
+%endif
 
 test_a20:
   push cx
@@ -116,7 +124,8 @@ halt:
 
 msgOk  db "Kernel going up...", 0
 msgErr db "Could not read the next sector.", 0
-msgA20 db "Could not enable A20 gate.", 0
+msgA20Disabled  db "A20 gate disabled. Trying to enable it...", 0
+msgA20Failed    db "Could not enable A20 gate.", 0
 
 times 510 - ($-$$) db 0 ; pad remainder of boot sector with 0s
 dw 0AA55h ; boot signature
